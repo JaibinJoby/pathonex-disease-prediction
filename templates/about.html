@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="About PathoNex - ML-based disease prediction system">
+    <title>About | PathoNex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <svg class="icon-medical" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                <span>PathoNex</span>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('about') }}" class="nav-link active">About</a>
+                <a href="{{ url_for('profile') }}" class="nav-link">Profile</a>
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 16v-4"></path>
+                            <path d="M12 8h.01"></path>
+                        </svg>
+                        About PathoNex
+                    </h1>
+                </div>
+
+                <div class="about-content">
+                    <section class="about-section">
+                        <h2>What is PathoNex?</h2>
+                        <p>
+                            PathoNex is a next-generation disease prediction system powered by machine learning technology. 
+                            Our platform analyzes symptoms you provide and uses advanced ML algorithms to predict potential 
+                            diseases based on patterns learned from medical datasets.
+                        </p>
+                    </section>
+
+                    <section class="about-section">
+                        <h2>How It Works</h2>
+                        <p>
+                            PathoNex utilizes a trained machine learning model that has been trained on extensive medical 
+                            data containing symptoms and their associated diseases. When you select your symptoms, the system:
+                        </p>
+                        <ul class="about-list">
+                            <li>Analyzes the combination of symptoms you've selected</li>
+                            <li>Compares them against patterns learned from medical datasets</li>
+                            <li>Provides a prediction based on ML algorithms</li>
+                            <li>Offers general information about the predicted condition</li>
+                        </ul>
+                    </section>
+
+                    <section class="about-section">
+                        <h2>Important Medical Disclaimer</h2>
+                        <div class="warning-box">
+                            <div class="warning-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <div class="warning-content">
+                                <h3>⚠️ Critical Warning</h3>
+                                <p><strong>PathoNex provides predictions based on machine learning algorithms only.</strong></p>
+                                <p>
+                                    These predictions are <strong>NOT</strong> a substitute for professional medical advice, 
+                                    diagnosis, or treatment. The system is designed for informational and educational purposes 
+                                    only and should be used as a preliminary reference tool.
+                                </p>
+                                <p>
+                                    <strong>Always consult with qualified healthcare professionals, doctors, or medical 
+                                    practitioners for accurate diagnosis and appropriate medical care.</strong> Do not rely 
+                                    solely on the predictions provided by this system for making medical decisions.
+                                </p>
+                                <p>
+                                    Machine learning predictions are probabilistic in nature and may not always be accurate. 
+                                    Individual health conditions vary, and only a licensed medical professional can provide 
+                                    proper diagnosis and treatment recommendations.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="about-section">
+                        <h2>Limitations</h2>
+                        <ul class="about-list">
+                            <li>Predictions are based on statistical patterns, not individual medical examination</li>
+                            <li>The system cannot replace physical examination, lab tests, or professional medical consultation</li>
+                            <li>Results may vary and should not be considered definitive diagnoses</li>
+                            <li>The system does not account for individual medical history, genetics, or other personal factors</li>
+                            <li>Emergency medical situations require immediate professional medical attention</li>
+                        </ul>
+                    </section>
+
+                    <section class="about-section">
+                        <h2>When to Seek Medical Help</h2>
+                        <p>You should immediately consult a healthcare professional if you experience:</p>
+                        <ul class="about-list">
+                            <li>Severe or persistent symptoms</li>
+                            <li>Emergency medical situations</li>
+                            <li>Worsening of existing conditions</li>
+                            <li>Any concerns about your health</li>
+                        </ul>
+                        <p>
+                            <strong>Remember:</strong> This tool is meant to complement, not replace, professional medical care. 
+                            Always prioritize consultation with qualified healthcare providers for any health-related concerns.
+                        </p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 PathoNex. All rights reserved.</p>
+            <p class="footer-disclaimer">PathoNex – Next-gen disease prediction system</p>
+        </div>
+    </footer>
+</body>
+</html>
+

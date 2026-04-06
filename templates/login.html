@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | PathoNex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <svg class="icon-medical" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                <span>PathoNex</span>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('register') }}" class="nav-link">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1>Welcome Back</h1>
+                    <p>PathoNex – Next-gen disease prediction system</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash-message flash-{{ category }}">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        {% if category == 'success' %}
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                        {% else %}
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                        {% endif %}
+                                    </svg>
+                                    <span>{{ message }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" class="auth-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" name="email" required 
+                                   placeholder="Enter your email" 
+                                   value="{{ request.form.email if request.form }}"
+                                   class="form-input"
+                                   autocomplete="email"
+                                   autofocus>
+                            <span class="input-status" id="email_status"></span>
+                        </div>
+                        <div class="validation-message" id="email_error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" name="password" required 
+                                   placeholder="Enter your password"
+                                   class="form-input"
+                                   autocomplete="current-password">
+                            <span class="input-status" id="password_status"></span>
+                        </div>
+                        <div class="validation-message" id="password_error"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large btn-block" id="submitBtn">
+                        <span id="submitText">Login</span>
+                        <svg class="btn-icon" id="submitIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        <svg class="btn-icon btn-spinner" id="submitSpinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+                            <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"></path>
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 PathoNex. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Form elements
+        const form = document.getElementById('loginForm');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const submitIcon = document.getElementById('submitIcon');
+        const submitSpinner = document.getElementById('submitSpinner');
+
+        // Validation state
+        const validationState = {
+            email: false,
+            password: false
+        };
+
+        // Email Validation
+        email.addEventListener('blur', function() {
+            validateEmail();
+        });
+
+        email.addEventListener('input', function() {
+            const emailValue = this.value.trim();
+            if (emailValue.length > 0) {
+                validateEmail();
+            } else {
+                clearStatus('email');
+                clearError('email');
+                validationState.email = false;
+                updateSubmitButton();
+            }
+        });
+
+        function validateEmail() {
+            const emailValue = email.value.trim().toLowerCase();
+            const statusEl = document.getElementById('email_status');
+            const errorEl = document.getElementById('email_error');
+            
+            if (!emailValue) {
+                clearStatus('email');
+                clearError('email');
+                validationState.email = false;
+                updateSubmitButton();
+                return;
+            }
+
+            // Email format validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(emailValue)) {
+                showStatus('email', 'error');
+                showError('email', 'Invalid email format');
+                validationState.email = false;
+            } else {
+                showStatus('email', 'success');
+                clearError('email');
+                validationState.email = true;
+            }
+            updateSubmitButton();
+        }
+
+        // Password Validation
+        password.addEventListener('blur', function() {
+            validatePassword();
+        });
+
+        password.addEventListener('input', function() {
+            const passwordValue = this.value;
+            if (passwordValue.length > 0) {
+                validatePassword();
+            } else {
+                clearStatus('password');
+                clearError('password');
+                validationState.password = false;
+                updateSubmitButton();
+            }
+        });
+
+        function validatePassword() {
+            const passwordValue = password.value;
+            const statusEl = document.getElementById('password_status');
+            const errorEl = document.getElementById('password_error');
+            
+            if (!passwordValue) {
+                clearStatus('password');
+                clearError('password');
+                validationState.password = false;
+                updateSubmitButton();
+                return;
+            }
+
+            if (passwordValue.length < 6) {
+                showStatus('password', 'error');
+                showError('password', 'Password must be at least 6 characters');
+                validationState.password = false;
+            } else {
+                showStatus('password', 'success');
+                clearError('password');
+                validationState.password = true;
+            }
+            updateSubmitButton();
+        }
+
+        // Helper functions
+        function showError(fieldId, message) {
+            const errorEl = document.getElementById(fieldId + '_error');
+            errorEl.textContent = message;
+            errorEl.className = 'validation-message error';
+            document.getElementById(fieldId).classList.add('input-error');
+        }
+
+        function clearError(fieldId) {
+            const errorEl = document.getElementById(fieldId + '_error');
+            errorEl.textContent = '';
+            errorEl.className = 'validation-message';
+            document.getElementById(fieldId).classList.remove('input-error');
+        }
+
+        function showStatus(fieldId, status) {
+            const statusEl = document.getElementById(fieldId + '_status');
+            statusEl.className = 'input-status ' + status;
+            
+            if (status === 'success') {
+                statusEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            } else if (status === 'error') {
+                statusEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+            }
+        }
+
+        function clearStatus(fieldId) {
+            const statusEl = document.getElementById(fieldId + '_status');
+            statusEl.className = 'input-status';
+            statusEl.innerHTML = '';
+        }
+
+        function updateSubmitButton() {
+            const allValid = Object.values(validationState).every(v => v === true);
+            submitBtn.disabled = !allValid;
+        }
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            // Final validation
+            if (!Object.values(validationState).every(v => v === true)) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitText.textContent = 'Logging in...';
+            submitIcon.style.display = 'none';
+            submitSpinner.style.display = 'inline-block';
+        });
+
+        // Initial state
+        updateSubmitButton();
+    </script>
+</body>
+</html>

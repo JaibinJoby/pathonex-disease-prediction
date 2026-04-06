@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Profile | PathoNex</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <svg class="icon-medical" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                <span>PathoNex</span>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <div class="profile-icon-large">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <h1>Complete Your Profile</h1>
+                    <p>PathoNex – Next-gen disease prediction system</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash-message flash-{{ category }}">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        {% if category == 'success' %}
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                        {% else %}
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                        {% endif %}
+                                    </svg>
+                                    <span>{{ message }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" class="auth-form">
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required class="form-select">
+                            <option value="">Select your gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" required 
+                               placeholder="Enter your age" 
+                               min="1" max="120"
+                               value="{{ request.form.age if request.form }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required 
+                               placeholder="Enter your phone number" 
+                               value="{{ request.form.phone if request.form }}"
+                               class="form-input">
+                        <div class="validation-message" id="phone_error"></div>
+                    </div>
+
+                    <div class="info-card" style="margin-top: 1.5rem;">
+                        <div class="info-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 16v-4"></path>
+                                <path d="M12 8h.01"></path>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <p style="font-size: 0.9rem; margin: 0;">This information helps us provide more accurate predictions and is required only once.</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large btn-block">
+                        <span>Complete Profile</span>
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"></path>
+                            <path d="M12 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 PathoNex. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Form elements
+        const phone = document.getElementById('phone');
+        const form = document.querySelector('.auth-form');
+
+        // Phone Validation with AJAX
+        phone.addEventListener('blur', function() {
+            validatePhone();
+        });
+
+        phone.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                // Debounce validation
+                clearTimeout(this.validationTimeout);
+                this.validationTimeout = setTimeout(validatePhone, 500);
+            } else {
+                clearError('phone');
+            }
+        });
+
+        function validatePhone() {
+            const phoneValue = phone.value.trim();
+            const errorEl = document.getElementById('phone_error');
+            
+            if (!phoneValue) {
+                clearError('phone');
+                return;
+            }
+
+            fetch('/api/validate-phone', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phone: phoneValue })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    clearError('phone');
+                } else {
+                    showError('phone', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function showError(fieldId, message) {
+            const errorEl = document.getElementById(fieldId + '_error');
+            errorEl.textContent = message;
+            errorEl.className = 'validation-message error';
+            document.getElementById(fieldId).classList.add('input-error');
+        }
+
+        function clearError(fieldId) {
+            const errorEl = document.getElementById(fieldId + '_error');
+            errorEl.textContent = '';
+            errorEl.className = 'validation-message';
+            document.getElementById(fieldId).classList.remove('input-error');
+        }
+    </script>
+</body>
+</html>
+
